@@ -12,6 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.regex.Pattern
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
@@ -27,17 +28,39 @@ import javax.net.ssl.X509TrustManager
 class RetrofitClient : BaseRetrofitClient() {
 
     private companion object {
-        private const val BASE_URL =
-            "https://${Constant.SRS_SERVER_HTTPS}"
 //        private const val BASE_URL =
-//            "http://${Constant.SRS_SERVER_HTTP}"
+//            "https://${Constant.SRS_SERVER_HTTPS}"
+        private const val BASE_URL =
+            "http://${Constant.SRS_SERVER_HTTP}"
     }
 
-    val apiService by lazy {
-        getApiService(
-            ApiService::class.java,
-            BASE_URL
-        )
+//    val apiService by lazy {
+//        getApiService(
+//            ApiService::class.java,
+//            BASE_URL
+//        )
+//    }
+
+    fun getApiService(url:String):ApiService{
+        return getApiService(ApiService::class.java,"http://${getIps(url)[0]}:${Constant.SRS_SERVER_HTTP_PORT}")
+    }
+
+    /**
+     * 正则提前字符串中的IP地址
+     *
+     * @param ipString
+     * @return
+     */
+    private fun getIps(ipString: String?): List<String> {
+        val regEx = "((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)"
+        val ips: MutableList<String> = ArrayList()
+        val p = Pattern.compile(regEx)
+        val m = p.matcher(ipString)
+        while (m.find()) {
+            val result = m.group()
+            ips.add(result)
+        }
+        return ips
     }
 
     override fun generateOkHttpBuilder(builder: OkHttpClient.Builder): OkHttpClient.Builder {

@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.webrtc.*
+import java.util.regex.Pattern
 
 class MainActivity : BaseSupportActivity<DefaultViewModel, ActivityMainBinding>() {
     private val retrofitClient by inject<RetrofitClient>()
@@ -28,7 +29,7 @@ class MainActivity : BaseSupportActivity<DefaultViewModel, ActivityMainBinding>(
 
     private companion object {
         private const val URL =
-            "webrtc://${Constant.SRS_SERVER_IP}/live/livestream"
+            "webrtc://${Constant.SRS_SERVER_IP}/1/front/ai?eip=${Constant.SRS_SERVER_IP}"
     }
 
     override fun getLayoutId(): Int {
@@ -115,7 +116,7 @@ class MainActivity : BaseSupportActivity<DefaultViewModel, ActivityMainBinding>(
                             lifecycleScope.launch {
                                 val result = try {
                                     withContext(Dispatchers.IO) {
-                                        retrofitClient.apiService.play(srsBean)
+                                        retrofitClient.getApiService(url).play(srsBean)
                                     }
                                 } catch (e: Exception) {
                                     println("pull网络请求出错：${e.printStackTrace()}")
